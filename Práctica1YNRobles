@@ -1,0 +1,161 @@
+--EJERCICIO 1:
+
+CREATE DATABASE PROFESORES; --Lo pondremos entre comentarios la segunda vez que le demos.
+
+DROP TABLE IF EXISTS IMPARTE;
+DROP TABLE IF EXISTS ASIGNATURAS;
+DROP TABLE IF EXISTS PROFESORES;
+
+CREATE TABLE PROFESORES (
+	dni VARCHAR(10),
+	nombre VARCHAR(40),
+	categoria VARCHAR(4),
+	ingreso DATE,
+	CONSTRAINT PK_PROFESORES PRIMARY KEY (dni)
+);
+
+CREATE TABLE ASIGNATURAS (
+	codigo VARCHAR(5),
+	descripcion VARCHAR(35),
+	creditos DECIMAL(4,1),
+	creditosp DECIMAL(4,1),
+	CONSTRAINT PK_ASIGNATURAS PRIMARY KEY (codigo)
+);
+
+CREATE TABLE IMPARTE (
+	dni VARCHAR(10),
+	asignatura VARCHAR(5),
+	CONSTRAINT PK_IMPARTE PRIMARY KEY (dni, asignatura),
+	CONSTRAINT FK_IMPARTE_PROFESORES FOREIGN KEY (dni) REFERENCES PROFESORES (dni),
+	CONSTRAINT FK_IMPARTE_ASIGNATURAS FOREIGN KEY (asignatura) REFERENCES ASIGNATURAS (codigo)
+);
+
+--EJERCICIO 2:
+
+INSERT INTO PROFESORES
+(dni, nombre, categoria, ingreso)
+VALUES
+('21111222', 'Eva Giner', 'TEU', '1992-10-02'),
+('21222333', 'Manuel Perez', 'TEU', '1988-06-15'),
+('21333444', 'Rafaela Gomis', 'ASO6', '1993-06-15');
+
+INSERT INTO ASIGNATURAS
+(codigo, descripcion, creditos, creditosp)
+VALUES
+('DGBD', 'Diseño y gestión de bases de datos', '6.0', '3.0'),
+('FBD', 'Fundamentos de las bases de datos', '6.0', '1.5'),
+('FP', 'Fundamentos de la programacion', '9.0', '4.5'),
+('HI', 'Historia de la informatica', '4.5', NULL),
+('PC', 'Programacion concurrente', '6.0', '1.5');
+
+INSERT INTO IMPARTE
+(dni, asignatura)
+VALUES
+('21111222', 'DGBD'),
+('21111222', 'FBD'),
+('21333444', 'PC');
+
+--EJERCICIO 3:
+--a
+SELECT *
+FROM PROFESORES;
+
+--b
+SELECT categoria
+FROM PROFESORES;
+
+--c
+SELECT DISTINCT categoria
+FROM PROFESORES;
+
+--d
+SELECT nombre
+FROM PROFESORES
+WHERE categoria = 'TEU';
+
+--e
+SELECT nombre
+FROM PROFESORES
+WHERE categoria IN('TEU', 'ASO6');
+
+--f
+SELECT *
+FROM ASIGNATURAS
+WHERE creditosp IS NULL;
+
+--g
+SELECT descripcion, creditos
+FROM ASIGNATURAS
+WHERE creditos BETWEEN 5 AND 8;
+
+--h
+SELECT descripcion
+FROM ASIGNATURAS
+WHERE codigo IN('FBD', 'DGBD');
+
+--y
+SELECT PRO.nombre
+FROM PROFESORES PRO, IMPARTE IMP
+WHERE PRO.dni = IMP.dni AND asignatura NOT IN('HI', 'FBD', 'DGBD');
+
+--j
+SELECT nombre
+FROM PROFESORES
+WHERE nombre LIKE 'Rafa%';
+
+--k
+SELECT codigo
+FROM ASIGNATURAS
+WHERE descripcion LIKE '%bases de datos%';
+
+--l
+SELECT codigo
+FROM ASIGNATURAS
+WHERE codigo LIKE '__';
+
+--m
+SELECT descripcion
+FROM ASIGNATURAS
+WHERE descripcion LIKE '%informatic_';
+
+--n
+SELECT descripcion, creditos 
+FROM ASIGNATURAS 
+WHERE creditos=(SELECT MIN(creditos) FROM ASIGNATURAS);
+
+--o
+SELECT * 
+FROM ASIGNATURAS 
+WHERE creditos > (SELECT creditos FROM ASIGNATURAS WHERE codigo='HI');
+
+--p
+SELECT descripcion, creditos
+FROM ASIGNATURAS
+WHERE creditos=(SELECT MAX(creditos) FROM ASIGNATURAS);
+
+--q
+SELECT * 
+FROM ASIGNATURAS 
+WHERE creditos=(SELECT MIN(creditos) FROM ASIGNATURAS);
+
+--r
+SELECT DISTINCT PR.dni, PR.nombre
+FROM PROFESORES PR, IMPARTE IM
+WHERE PR.dni = IM.dni 
+AND asignatura IN(SELECT codigo FROM ASIGNATURAS WHERE creditos < (SELECT MAX(creditos) FROM ASIGNATURAS));
+
+--s
+SELECT PR.dni, PR.nombre, PR.categoria, PR.ingreso, IM.asignatura
+FROM PROFESORES PR, IMPARTE IM
+WHERE PR.dni = IM.dni;
+
+--t
+SELECT DISTINCT PR.dni, PR.nombre, PR.categoria, PR.ingreso
+FROM PROFESORES PR
+WHERE PR.dni NOT IN (SELECT dni FROM IMPARTE);
+
+--u
+SELECT nombre, ingreso
+FROM PROFESORES
+WHERE ingreso < '1990-01-01';
+
